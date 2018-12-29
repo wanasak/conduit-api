@@ -7,6 +7,5 @@ namespace conduit_api.Domain
 
         public string TagId { get; set; }
         public Tag Tag { get; set; }
-
     }
 }

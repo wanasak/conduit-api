@@ -15,6 +15,7 @@ namespace conduit_api
 {
     public class Startup
     {
+        public const string DATABASE_FILE = "realworld.db";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
