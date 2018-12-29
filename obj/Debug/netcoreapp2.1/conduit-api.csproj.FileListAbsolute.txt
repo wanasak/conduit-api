@@ -1,0 +1,14 @@
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/bin/Debug/netcoreapp2.1/conduit-api.deps.json
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/bin/Debug/netcoreapp2.1/conduit-api.runtimeconfig.json
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/bin/Debug/netcoreapp2.1/conduit-api.runtimeconfig.dev.json
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/bin/Debug/netcoreapp2.1/conduit-api.dll
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/bin/Debug/netcoreapp2.1/conduit-api.pdb
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/obj/Debug/netcoreapp2.1/conduit-api.csprojAssemblyReference.cache
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/obj/Debug/netcoreapp2.1/conduit-api.csproj.CoreCompileInputs.cache
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/obj/Debug/netcoreapp2.1/conduit-api.RazorAssemblyInfo.cache
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/obj/Debug/netcoreapp2.1/conduit-api.RazorAssemblyInfo.cs
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/obj/Debug/netcoreapp2.1/conduit-api.AssemblyInfoInputs.cache
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/obj/Debug/netcoreapp2.1/conduit-api.AssemblyInfo.cs
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/obj/Debug/netcoreapp2.1/conduit-api.RazorTargetAssemblyInfo.cache
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/obj/Debug/netcoreapp2.1/conduit-api.dll
+/Users/wanasaksurainranggoon/Documents/Demos/netcore/conduit-api/obj/Debug/netcoreapp2.1/conduit-api.pdb
