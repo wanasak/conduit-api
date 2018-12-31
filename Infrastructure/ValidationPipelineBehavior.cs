@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 
-namespace conduit_api.Infrastructure.Security
+namespace conduit_api.Infrastructure
 {
     public class ValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
