@@ -45,6 +45,11 @@ namespace conduit_api
                 app.UseHsts();
             }
 
+            app.UseCors(builder => builder
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowAnyOrigin());
+
             app.UseHttpsRedirection();
             app.UseMvc();
         }
