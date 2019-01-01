@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using AutoMapper;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace conduit_api
 {
@@ -33,6 +34,27 @@ namespace conduit_api
             services.AddCors();
 
             services.AddAutoMapper(GetType().Assembly);
+
+            services.AddSwaggerGen(x =>
+            {
+                x.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                {
+                    In = "header",
+                    Description = "Please insert JWT with Bearer into field",
+                    Name = "Authorization",
+                    Type = "apiKey"
+                });
+
+                x.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                {
+                    { "Bearer", new string[] {}}
+                });
+
+                x.SwaggerDoc("v1", new Info { Title = "RealWorld API", Version = "v1" });
+                x.CustomSchemaIds(y => y.FullName);
+                x.DocInclusionPredicate((version, apiDescription) => true);
+                x.TagActionsBy(y => y.GroupName);
+            });
 
             services.AddJwt();
         }
@@ -60,6 +82,18 @@ namespace conduit_api
 
             // app.UseHttpsRedirection();
             app.UseMvc();
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = "swagger/{documentName}/swagger.json";
+            });
+
+            // Enable middleware to serve swagger-ui assets(HTML, JS, CSS etc.)
+            app.UseSwaggerUI(x =>
+            {
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "RealWorld API V1");
+            });
         }
     }
 }
