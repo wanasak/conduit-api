@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using AutoMapper;
 using Swashbuckle.AspNetCore.Swagger;
 using conduit_api.Infrastructure;
+using Newtonsoft.Json;
 
 namespace conduit_api
 {
@@ -34,7 +35,13 @@ namespace conduit_api
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<ConduitContext>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services
+                .AddMvc(opts =>
+                {
+                    opts.Conventions.Add(new GroupByApiRootConvention());
+                    opts.Filters.Add(typeof(ValidatorActionFilter));
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddCors();
 
