@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using AutoMapper;
 using Swashbuckle.AspNetCore.Swagger;
+using conduit_api.Infrastructure;
 
 namespace conduit_api
 {
@@ -29,6 +30,10 @@ namespace conduit_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services
+                .AddEntityFrameworkSqlite()
+                .AddDbContext<ConduitContext>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddCors();
@@ -94,6 +99,8 @@ namespace conduit_api
             {
                 x.SwaggerEndpoint("/swagger/v1/swagger.json", "RealWorld API V1");
             });
+
+            app.ApplicationServices.GetRequiredService<ConduitContext>().Database.EnsureCreated();
         }
     }
 }
