@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using AutoMapper;
 
 namespace conduit_api
 {
@@ -30,7 +31,9 @@ namespace conduit_api
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddCors();
-            
+
+            services.AddAutoMapper(GetType().Assembly);
+
             services.AddJwt();
         }
 
