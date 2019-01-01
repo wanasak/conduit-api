@@ -15,6 +15,7 @@ using AutoMapper;
 using Swashbuckle.AspNetCore.Swagger;
 using conduit_api.Infrastructure;
 using Newtonsoft.Json;
+using FluentValidation.AspNetCore;
 
 namespace conduit_api
 {
@@ -44,6 +45,10 @@ namespace conduit_api
                 .AddJsonOptions(opts =>
                 {
                     opts.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                })
+                .AddFluentValidation(cfg =>
+                {
+                    cfg.RegisterValidatorsFromAssemblyContaining<Startup>();
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
