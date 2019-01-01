@@ -41,6 +41,10 @@ namespace conduit_api
                     opts.Conventions.Add(new GroupByApiRootConvention());
                     opts.Filters.Add(typeof(ValidatorActionFilter));
                 })
+                .AddJsonOptions(opts =>
+                {
+                    opts.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddCors();
