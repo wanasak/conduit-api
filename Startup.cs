@@ -16,6 +16,9 @@ using Swashbuckle.AspNetCore.Swagger;
 using conduit_api.Infrastructure;
 using Newtonsoft.Json;
 using FluentValidation.AspNetCore;
+using MediatR;
+using conduit_api.Infrastructure.Security;
+using Microsoft.AspNetCore.Http;
 
 namespace conduit_api
 {
@@ -32,6 +35,10 @@ namespace conduit_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMediatR();
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(DBContextTransactionPipelineBehavior<,>));
+
             services
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<ConduitContext>();
@@ -76,6 +83,11 @@ namespace conduit_api
                 x.DocInclusionPredicate((version, apiDescription) => true);
                 x.TagActionsBy(y => y.GroupName);
             });
+
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+            services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddJwt();
         }
