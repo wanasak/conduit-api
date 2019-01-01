@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 using conduit_api.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace conduit_api
 {
@@ -61,6 +64,18 @@ namespace conduit_api
                         }
                     };
                 });
+        }
+
+        public static void AddSeriLogging(this ILoggerFactory loggerFactory)
+        {
+            var log = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
+                .Enrich.FromLogContext()
+                .WriteTo.Console(outputTemplate: "{Timestamp:HH:mm:ss} [{Level}] {SourceContext} {Message}{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
+                .CreateLogger();
+
+            loggerFactory.AddSerilog(log);
+            Log.Logger = log;
         }
     }
 }
