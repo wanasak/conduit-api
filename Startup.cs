@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using conduit_api.Infrastructure.Errors;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,6 +29,8 @@ namespace conduit_api
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            services.AddCors();
+            
             services.AddJwt();
         }
 
@@ -35,6 +38,8 @@ namespace conduit_api
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddSeriLogging();
+
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             if (env.IsDevelopment())
             {
@@ -50,7 +55,7 @@ namespace conduit_api
                 .AllowAnyMethod()
                 .AllowAnyOrigin());
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
