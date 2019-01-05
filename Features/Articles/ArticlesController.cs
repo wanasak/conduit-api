@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace conduit_api.Features.Articles
 {
     [Route("articles")]
-    public class ArticlesController
+    public class ArticlesController : Controller
     {
         private readonly IMediator _mediator;
 
