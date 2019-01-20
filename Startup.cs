@@ -1,38 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using conduit_api.Infrastructure.Errors;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using AutoMapper;
-using Swashbuckle.AspNetCore.Swagger;
+﻿using AutoMapper;
+using conduit_api;
+using conduit_api.Features.Profiles;
 using conduit_api.Infrastructure;
-using Newtonsoft.Json;
+using conduit_api.Infrastructure.Errors;
+using conduit_api.Infrastructure.Security;
 using FluentValidation.AspNetCore;
 using MediatR;
-using conduit_api.Infrastructure.Security;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.Collections.Generic;
 
 namespace conduit_api
 {
     public class Startup
     {
         public const string DATABASE_FILE = "realworld.db";
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMediatR();
@@ -43,26 +34,9 @@ namespace conduit_api
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<ConduitContext>();
 
-            services
-                .AddMvc(opts =>
-                {
-                    opts.Conventions.Add(new GroupByApiRootConvention());
-                    opts.Filters.Add(typeof(ValidatorActionFilter));
-                })
-                .AddJsonOptions(opts =>
-                {
-                    opts.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                })
-                .AddFluentValidation(cfg =>
-                {
-                    cfg.RegisterValidatorsFromAssemblyContaining<Startup>();
-                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddLocalization(x => x.ResourcesPath = "Resources");
 
-            services.AddCors();
-
-            services.AddAutoMapper(GetType().Assembly);
-
+            // Inject an implementation of ISwaggerProvider with defaulted settings applied
             services.AddSwaggerGen(x =>
             {
                 x.AddSecurityDefinition("Bearer", new ApiKeyScheme
@@ -75,45 +49,50 @@ namespace conduit_api
 
                 x.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
                 {
-                    { "Bearer", new string[] {}}
+                    { "Bearer", new string[] { } }
                 });
-
                 x.SwaggerDoc("v1", new Info { Title = "RealWorld API", Version = "v1" });
                 x.CustomSchemaIds(y => y.FullName);
                 x.DocInclusionPredicate((version, apiDescription) => true);
                 x.TagActionsBy(y => y.GroupName);
             });
 
+            services.AddCors();
+            services.AddMvc(opt =>
+                {
+                    opt.Conventions.Add(new GroupByApiRootConvention());
+                    opt.Filters.Add(typeof(ValidatorActionFilter));
+                })
+                .AddJsonOptions(opt =>
+                {
+                    opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                })
+                .AddFluentValidation(cfg => { cfg.RegisterValidatorsFromAssemblyContaining<Startup>(); });
+
+            services.AddAutoMapper(GetType().Assembly);
+
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
+            services.AddScoped<IProfileReader, ProfileReader>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddJwt();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
         {
             loggerFactory.AddSeriLogging();
 
             app.UseMiddleware<ErrorHandlingMiddleware>();
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHsts();
-            }
-
-            app.UseCors(builder => builder
+            app.UseCors(builder =>
+                builder
+                .AllowAnyOrigin()
                 .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowAnyOrigin());
+                .AllowAnyMethod());
 
-            // app.UseHttpsRedirection();
             app.UseMvc();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint
@@ -128,7 +107,7 @@ namespace conduit_api
                 x.SwaggerEndpoint("/swagger/v1/swagger.json", "RealWorld API V1");
             });
 
-            app.ApplicationServices.GetRequiredService<ConduitContext>().Database.EnsureCreated();
+            serviceProvider.GetRequiredService<ConduitContext>().Database.EnsureCreated();
         }
     }
 }

@@ -1,8 +1,9 @@
-using System;
-using System.Data;
+using conduit_api;
 using conduit_api.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
+using System.Threading.Tasks;
 
 namespace conduit_api.Infrastructure
 {
@@ -11,9 +12,9 @@ namespace conduit_api.Infrastructure
         private readonly string _databaseName = Startup.DATABASE_FILE;
         private IDbContextTransaction _currentTransaction;
 
-        public ConduitContext(DbContextOptions options) : base(options)
+        public ConduitContext(DbContextOptions options)
+            : base(options)
         {
-
         }
 
         public ConduitContext(string databaseName)
@@ -27,7 +28,7 @@ namespace conduit_api.Infrastructure
         public DbSet<Tag> Tags { get; set; }
         public DbSet<ArticleTag> ArticleTags { get; set; }
         public DbSet<ArticleFavorite> ArticleFavorites { get; set; }
-        public DbSet<FollowedPeople> FollowedPeoples { get; set; }
+        public DbSet<FollowedPeople> FollowedPeople { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -38,41 +39,51 @@ namespace conduit_api.Infrastructure
         {
             modelBuilder.Entity<ArticleTag>(b =>
             {
-                b.HasKey(at => new { at.TagId, at.ArticleId });
+                b.HasKey(t => new { t.ArticleId, t.TagId });
 
-                b.HasOne(at => at.Article)
-                    .WithMany(a => a.ArticleTags)
-                    .HasForeignKey(at => at.TagId);
+                b.HasOne(pt => pt.Article)
+                .WithMany(p => p.ArticleTags)
+                .HasForeignKey(pt => pt.ArticleId);
 
-                b.HasOne(at => at.Tag)
-                    .WithMany(t => t.ArticleTags)
-                    .HasForeignKey(at => at.TagId);
+                b.HasOne(pt => pt.Tag)
+                .WithMany(t => t.ArticleTags)
+                .HasForeignKey(pt => pt.TagId);
             });
 
             modelBuilder.Entity<ArticleFavorite>(b =>
             {
-                b.HasKey(af => new { af.ArticleId, af.PersonId });
+                b.HasKey(t => new { t.ArticleId, t.PersonId });
 
-                b.HasOne(af => af.Article)
-                    .WithMany(a => a.ArticleFavorites)
-                    .HasForeignKey(af => af.ArticleId);
-
-                b.HasOne(af => af.Person)
+                b.HasOne(pt => pt.Article)
                     .WithMany(p => p.ArticleFavorites)
-                    .HasForeignKey(af => af.PersonId);
+                    .HasForeignKey(pt => pt.ArticleId);
+
+                b.HasOne(pt => pt.Person)
+                    .WithMany(t => t.ArticleFavorites)
+                    .HasForeignKey(pt => pt.PersonId);
             });
 
             modelBuilder.Entity<FollowedPeople>(b =>
             {
-                b.HasKey(fp => new { fp.ObserverId, fp.TargetId });
+                b.HasKey(t => new { t.ObserverId, t.TargetId });
+
+                b.HasOne(pt => pt.Observer)
+                    .WithMany(p => p.Followers)
+                    .HasForeignKey(pt => pt.ObserverId);
+
+                b.HasOne(pt => pt.Target)
+                    .WithMany(t => t.Following)
+                    .HasForeignKey(pt => pt.TargetId);
             });
         }
 
         #region Transaction Handling
-
         public void BeginTransaction()
         {
-            if (_currentTransaction != null) return;
+            if (_currentTransaction != null)
+            {
+                return;
+            }
 
             _currentTransaction = Database.BeginTransaction(IsolationLevel.ReadCommitted);
         }
@@ -113,7 +124,6 @@ namespace conduit_api.Infrastructure
                 }
             }
         }
-
         #endregion
     }
 }
